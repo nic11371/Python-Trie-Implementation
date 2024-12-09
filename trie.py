@@ -85,16 +85,23 @@ class PrefixTree:
         Returns a list of all words beginning with the given prefix, or
         an empty list if no words begin with that prefix.
         '''
-        words = list()
-        current = self.root
+        found_words = []
+        prefix_list = []
+
+        def walk(node, word_list=None):
+            if node.is_word:
+                found_words.append(''.join(word_list + [node.text]))
+            for w in node.children:
+                walk(node.children[w],  word_list + [node.text])
+
         for char in prefix:
-            if char not in current.children:
-                # Could also just do return words since it's empty
-                return list()
-            current = current.children[char]
-        
-        self.__child_words_for(current, words)
-        return words
+            if char not in self.root.children:
+                return []
+            self.root = self.root.children[char]
+            prefix_list.append(self.root.text)
+        walk(self.root, prefix_list[:-1])
+
+        return sorted(found_words)
 
 
     def size(self, current = None):
